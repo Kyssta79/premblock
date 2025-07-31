@@ -44,11 +44,11 @@ public class PremiumBlocker {
     
     @Subscribe
     public void onPreLogin(PreLoginEvent event) {
-        String username = event.getPlayer().getUsername();
+        String username = event.getUsername();
         
         logger.info("=== CONNECTION ATTEMPT ===");
         logger.info("Username: {}", username);
-        logger.info("Connection: {}", event.getConnection().getRemoteAddress());
+        logger.info("Connection: {}", event.getConnection());
         
         // Check if this is a premium account trying to connect
         checkPremiumStatusAsync(username).thenAccept(isPremium -> {
