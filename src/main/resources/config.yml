@@ -1,0 +1,26 @@
+# PremiumBlocker Configuration
+# 
+# Settings for blocking premium authenticated players
+
+# The message shown to blocked premium players
+# Supports color codes with & (e.g., &c for red, &a for green)
+kick-message: "&cPlease join from pakmc.xyz"
+
+# Enable/disable the premium blocker
+enabled: true
+
+# Cache duration for Mojang API results (in minutes)
+# This reduces API calls for repeated connection attempts
+cache-duration: 5
+
+# Debug mode - shows detailed connection information in console
+debug: true
+
+# Mojang API settings
+mojang-api:
+  # Timeout for API requests (in milliseconds)
+  timeout: 3000
+  
+  # Enable/disable Mojang API checking
+  # If disabled, only UUID-based detection will be used
+  enabled: true
