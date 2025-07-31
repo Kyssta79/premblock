@@ -3,6 +3,7 @@ package xyz.pakmc.premiumblocker;
 import com.google.inject.Inject;
 import com.velocitypowered.api.event.Subscribe;
 import com.velocitypowered.api.event.connection.LoginEvent;
+import com.velocitypowered.api.event.proxy.ProxyInitializeEvent;
 import com.velocitypowered.api.plugin.Plugin;
 import com.velocitypowered.api.proxy.ProxyServer;
 import net.kyori.adventure.text.Component;
@@ -35,6 +36,11 @@ public class PremiumBlocker {
     public PremiumBlocker(ProxyServer server, Logger logger) {
         this.server = server;
         this.logger = logger;
+        logger.info("PremiumBlocker is loading...");
+    }
+    
+    @Subscribe
+    public void onProxyInitialization(ProxyInitializeEvent event) {
         logger.info("PremiumBlocker has been enabled! Now checking against Mojang API...");
         
         // Clear cache every 10 minutes to allow for account changes

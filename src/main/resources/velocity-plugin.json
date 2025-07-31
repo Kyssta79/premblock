@@ -1,0 +1,9 @@
+{
+  "id": "premiumblocker",
+  "name": "PremiumBlocker",
+  "version": "1.0.0",
+  "description": "Blocks premium players from joining cracked Velocity proxy",
+  "authors": ["PakMC"],
+  "dependencies": [],
+  "main": "xyz.pakmc.premiumblocker.PremiumBlocker"
+}
