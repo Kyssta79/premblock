@@ -16,53 +16,32 @@ The plugin listens to the `PreLoginEvent` and checks if the connecting player is
 ## Best Logic Approaches
 
 ### 1. Current Approach: PreLoginEvent + isOnlineMode() ✅ **RECOMMENDED**
+**UPDATED**: Now using Mojang API verification since offline-mode proxies don't authenticate players.
+
+### 1. Current Approach: Mojang API Verification ✅ **RECOMMENDED**
 ```java
-@Subscribe
-public void onPreLogin(PreLoginEvent event) {
-    if (event.getConnection().isOnlineMode()) {
-        // Block premium player
-    }
+private boolean isPremiumPlayer(String username) {
+    URL url = new URL("https://api.mojang.com/users/profiles/minecraft/" + username);
+    // HTTP 200 = Premium, HTTP 204/404 = Available (cracked)
 }
 ```
-**Pros**: Simple, reliable, catches players before they fully connect
-**Cons**: None significant
+**Pros**: Works with offline-mode proxies, accurate detection, cached results
+**Cons**: Requires internet connection, small delay for API calls
 
-### 2. Alternative: PostLoginEvent + GameProfile UUID Check
+### 2. Alternative: UUID Pattern Analysis
 ```java
-@Subscribe
-public void onPostLogin(PostLoginEvent event) {
-    UUID playerUUID = event.getPlayer().getUniqueId();
-    // Check if UUID follows Mojang's online-mode pattern
-    if (isOnlineModeUUID(playerUUID, event.getPlayer().getUsername())) {
-        event.getPlayer().disconnect(Component.text("Please join from pakmc.xyz"));
-    }
+private boolean isPremiumUUID(UUID playerUUID, String username) {
+    UUID crackedUUID = UUID.nameUUIDFromBytes(("OfflinePlayer:" + username).getBytes());
+    return !playerUUID.equals(crackedUUID);
 }
 ```
-**Pros**: Can catch some edge cases
-**Cons**: Player already connected, requires UUID pattern analysis
+**Pros**: No external calls, instant
+**Cons**: May not work reliably with offline-mode proxies
 
-### 3. Alternative: Async Mojang API Verification
+### 3. Alternative: Username Blacklist + Manual Management
 ```java
-@Subscribe
-public void onPostLogin(PostLoginEvent event) {
-    // Async check against Mojang API
-    CompletableFuture.supplyAsync(() -> {
-        // Check if username exists in Mojang database
-    }).thenAccept(isPremium -> {
-        if (isPremium) event.getPlayer().disconnect(...);
-    });
-}
-```
-**Pros**: Most accurate detection
-**Cons**: Requires external API calls, player already connected, network dependent
-
-### 4. Alternative: Username Blacklist + API Check
-```java
-// Maintain a cache of known premium usernames
 private final Set<String> premiumUsernames = new ConcurrentHashMap<>();
 ```
-**Pros**: Can preemptively block known premium accounts
-**Cons**: Requires maintenance, may have false positives
 
 ## Compilation Guide (Maven)
 
