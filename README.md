@@ -27,19 +27,21 @@ public void onPreLogin(PreLoginEvent event) {
 **Pros**: Simple, reliable, catches players before they fully connect
 **Cons**: None significant
 
-### 2. Alternative: LoginEvent + GameProfile Check
+### 2. Alternative: PostLoginEvent + GameProfile UUID Check
 ```java
 @Subscribe
-public void onLogin(LoginEvent event) {
-    if (event.getPlayer().getGameProfile().getId() != null) {
-        // Check if UUID is valid Mojang UUID
+public void onPostLogin(PostLoginEvent event) {
+    UUID playerUUID = event.getPlayer().getUniqueId();
+    // Check if UUID follows Mojang's online-mode pattern
+    if (isOnlineModeUUID(playerUUID, event.getPlayer().getUsername())) {
+        event.getPlayer().disconnect(Component.text("Please join from pakmc.xyz"));
     }
 }
 ```
-**Pros**: More detailed player info available
-**Cons**: Player already partially connected, more complex UUID validation needed
+**Pros**: Can catch some edge cases
+**Cons**: Player already connected, requires UUID pattern analysis
 
-### 3. Alternative: PostLoginEvent + Async Mojang API Check
+### 3. Alternative: Async Mojang API Verification
 ```java
 @Subscribe
 public void onPostLogin(PostLoginEvent event) {
@@ -54,13 +56,13 @@ public void onPostLogin(PostLoginEvent event) {
 **Pros**: Most accurate detection
 **Cons**: Requires external API calls, player already connected, network dependent
 
-### 4. Alternative: Connection Throttling + IP Tracking
+### 4. Alternative: Username Blacklist + API Check
 ```java
-// Track connection patterns and block suspicious IPs
-private final Map<InetAddress, Integer> connectionAttempts = new ConcurrentHashMap<>();
+// Maintain a cache of known premium usernames
+private final Set<String> premiumUsernames = new ConcurrentHashMap<>();
 ```
-**Pros**: Can detect premium launchers
-**Cons**: Complex, may block legitimate players
+**Pros**: Can preemptively block known premium accounts
+**Cons**: Requires maintenance, may have false positives
 
 ## Compilation Guide (Maven)
 
